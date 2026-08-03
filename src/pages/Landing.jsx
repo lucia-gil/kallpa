@@ -8,19 +8,35 @@ const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
-};
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.12 } } };
 
-const PREGUNTA_ANIMO = {
-  key: "estado_animo",
-  texto: '¿Cómo te sientes con la "U" ahora mismo?',
+function textoAnimo(genero) {
+  const base = [
+    { valor: "cinismo", n: "Un poco desmotivad{o}, como que ya me da igual todo" },
+    { valor: "ineficacia", n: "Siento que no avanzo o que no doy la talla" },
+    { valor: "leve", n: "Ahí vamos, solo necesito un respiro para no explotar" },
+  ];
+  const sufijo = genero === "hombre" ? "o" : genero === "mujer" ? "a" : "o/a";
+  const agotamiento =
+    genero === "hombre"
+      ? "Agotado, siento que mi batería está en 0%"
+      : genero === "mujer"
+      ? "Agotada, siento que mi batería está en 0%"
+      : "Agotade, siento que mi batería está en 0%";
+
+  return [
+    { valor: "agotamiento", label: agotamiento },
+    ...base.map((o) => ({ valor: o.valor, label: o.n.replace("{o}", sufijo) })),
+  ];
+}
+
+const PREGUNTA_GENERO = {
+  key: "genero",
+  texto: "¿Cómo te identificas? (para hablarte mejor)",
   opciones: [
-    { valor: "agotamiento", label: "Agotadaza, siento que mi batería está en 0%" },
-    { valor: "cinismo", label: "Un poco desmotivada, como que ya me da igual todo" },
-    { valor: "ineficacia", label: "Siento que no avanzo o que no doy la talla" },
-    { valor: "leve", label: "Ahí vamos, solo necesito un respiro para no explotar" },
+    { valor: "mujer", label: "Mujer" },
+    { valor: "hombre", label: "Hombre" },
+    { valor: "otro", label: "Otro / prefiero no decir" },
   ],
 };
 
@@ -46,10 +62,8 @@ const PREGUNTA_RETO = {
   ],
 };
 
-const PREGUNTAS = [PREGUNTA_ANIMO, PREGUNTA_APOYO, PREGUNTA_RETO];
-
 export default function Landing() {
-  const [paso, setPaso] = useState(0); // 0 = datos básicos, 1..3 = preguntas
+  const [paso, setPaso] = useState(0); // 0 = datos básicos, 1..4 = preguntas
   const [name, setName] = useState("");
   const [carrera, setCarrera] = useState("");
   const [ciclo, setCiclo] = useState("");
@@ -57,7 +71,6 @@ export default function Landing() {
   const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
 
-  // Si ya hay sesión activa (mismo navegador), no pedimos el formulario de nuevo
   useEffect(() => {
     (async () => {
       const session = await getSession();
@@ -71,14 +84,18 @@ export default function Landing() {
 
   const handleDatosBasicos = (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    const limpio = name.trim();
+    if (limpio.length < 2) return;
+    setName(limpio);
     setPaso(1);
   };
+
+  const TOTAL_PREGUNTAS = 4;
 
   const handleRespuesta = (key, valor) => {
     const nuevas = { ...respuestas, [key]: valor };
     setRespuestas(nuevas);
-    if (paso < PREGUNTAS.length) {
+    if (paso < TOTAL_PREGUNTAS) {
       setPaso(paso + 1);
     } else {
       navigate("/matching", { state: { name, carrera, ciclo, ...nuevas } });
@@ -87,6 +104,12 @@ export default function Landing() {
 
   if (checkingSession) return null;
 
+  const preguntaAnimo = {
+    key: "estado_animo",
+    texto: '¿Cómo te sientes con la "U" ahora mismo?',
+    opciones: textoAnimo(respuestas.genero),
+  };
+  const PREGUNTAS = [PREGUNTA_GENERO, preguntaAnimo, PREGUNTA_APOYO, PREGUNTA_RETO];
   const preguntaActual = paso >= 1 && paso <= PREGUNTAS.length ? PREGUNTAS[paso - 1] : null;
 
   return (
@@ -103,8 +126,7 @@ export default function Landing() {
             Kallpa
           </span>
         </div>
-
-        <a
+        
           href="#login"
           className="text-sm text-kallpa-coral-dark/70 hover:text-kallpa-coral-dark transition"
         >
@@ -114,11 +136,7 @@ export default function Landing() {
 
       {/* Hero */}
       <main className="max-w-6xl mx-auto px-6 md:px-12 pt-8 pb-24 grid md:grid-cols-2 gap-12 items-center">
-        <motion.div
-          initial="hidden"
-          animate="show"
-          variants={stagger}
-        >
+        <motion.div initial="hidden" animate="show" variants={stagger}>
           <motion.h1
             variants={fadeUp}
             className="font-title text-4xl md:text-5xl font-semibold text-kallpa-coral-dark leading-tight mb-4"
@@ -212,7 +230,7 @@ export default function Landing() {
                 className="flex flex-col flex-1"
               >
                 <p className="text-xs text-kallpa-coral-dark/50 mb-2">
-                  Pregunta {paso} de {PREGUNTAS.length}
+                  Pregunta {paso} de {TOTAL_PREGUNTAS}
                 </p>
                 <h2 className="font-title text-xl font-semibold text-kallpa-coral-dark mb-6">
                   {preguntaActual.texto}
