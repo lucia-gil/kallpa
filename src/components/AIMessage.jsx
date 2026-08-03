@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { generateWeeklyMessage } from "../lib/claude";
+import { generateWeeklyMessage, modoDemo } from "../lib/claude";
 
 export default function AIMessage({ checkins, grupoNombre }) {
   const [mensaje, setMensaje] = useState(null);
@@ -19,9 +19,17 @@ export default function AIMessage({ checkins, grupoNombre }) {
 
   return (
     <div className="bg-kallpa-coral/15 rounded-3xl p-5">
-      <p className="text-xs uppercase tracking-wide text-kallpa-coral-dark/60 mb-2">
-        Mensaje de la semana
-      </p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs uppercase tracking-wide text-kallpa-coral-dark/60">
+          Mensaje de la semana
+        </p>
+        {modoDemo && (
+          <span className="text-[10px] bg-white/60 text-kallpa-coral-dark/60 px-2 py-0.5 rounded-full">
+            modo demo
+          </span>
+        )}
+      </div>
+      
       {mensaje ? (
         <p className="text-sm text-kallpa-coral-dark leading-relaxed">{mensaje}</p>
       ) : (

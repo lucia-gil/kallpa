@@ -1,13 +1,19 @@
-// NOTA IMPORTANTE PARA EL HACKATHON:
-// Esta llamada se hace directo desde el frontend por simplicidad de demo.
-// Esto expone la API key en el navegador — está bien para una demo local/
-// hackathon, pero para producción real se debe mover esta llamada a un
-// backend (ej. una función serverless de Supabase o Vercel) que guarde
-// la key como variable de entorno del servidor, nunca del cliente.
 
 const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
+// Si no hay key configurada, la app funciona en "modo demo": usa mensajes
+// precargados en vez de llamar a la API. Así el proyecto se puede correr,
+// mostrar, y presentar sin necesitar una cuenta de pago en Console.
+export const modoDemo = !API_KEY;
+
 export async function generateWeeklyMessage(checkins, grupoNombre) {
+  if (modoDemo) {
+    const { getMensajeDemo } = await import("../data/mensajesDemo");
+    // Simula un pequeño delay como si fuera una llamada real
+    await new Promise((r) => setTimeout(r, 600));
+    return getMensajeDemo(checkins.length);
+  }
+
   const resumen = checkins
     .map((c) => `- ${c.mood}: ${c.nota}`)
     .join("\n");
