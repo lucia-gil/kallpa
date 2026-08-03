@@ -3,19 +3,19 @@ export default function MicroChallenge({ reto, grupo }) {
   const total = grupo.integrantes.length;
 
   return (
-    <div className="bg-kallpa-teal/20 rounded-3xl p-5">
-      <p className="text-xs uppercase tracking-wide text-kallpa-teal-dark/60 mb-2">
+    <div className="bg-kallpa-teal/15 rounded-3xl shadow-card p-6">
+      <p className="text-xs uppercase tracking-widest text-kallpa-teal-dark/60 font-semibold mb-2">
         Reto de la semana
       </p>
-      <p className="text-sm font-medium text-kallpa-teal-dark mb-3">{reto.titulo}</p>
-      <div className="flex items-center gap-2">
-        <div className="flex-1 h-2 rounded-full bg-white/60 overflow-hidden">
+      <p className="font-display text-lg text-kallpa-teal-dark mb-4">{reto.titulo}</p>
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-2.5 rounded-full bg-white/70 overflow-hidden">
           <div
-            className="h-full bg-kallpa-teal"
+            className="h-full rounded-full bg-kallpa-teal transition-all duration-500"
             style={{ width: `${(progreso / total) * 100}%` }}
           />
         </div>
-        <span className="text-xs text-kallpa-teal-dark/70">
+        <span className="text-xs font-semibold text-kallpa-teal-dark/70 tabular-nums">
           {progreso}/{total}
         </span>
       </div>
