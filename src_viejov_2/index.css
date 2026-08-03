@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500&display=swap');
+
+@theme {
+  --color-kallpa-coral: #F0997B;
+  --color-kallpa-coral-dark: #4A1B0C;
+  --color-kallpa-teal: #5DCAA5;
+  --color-kallpa-teal-dark: #04342C;
+  --color-kallpa-cream: #FAEEDA;
+  --color-kallpa-text: #712B13;
+  --font-title: "Fraunces", serif;
+}
+
+body {
+  background-color: var(--color-kallpa-cream);
+  background-image: radial-gradient(circle at 1px 1px, rgba(74, 27, 12, 0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+  color: var(--color-kallpa-coral-dark);
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.font-title {
+  font-family: var(--font-title);
+}
+
+* {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}

@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
-import Matching from "./pages/Matching";
 import Dashboard from "./pages/Dashboard";
 
 function App() {
@@ -8,7 +7,6 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/matching" element={<Matching />} />
         <Route path="/app" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
