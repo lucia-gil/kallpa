@@ -1,9 +1,10 @@
 import { useState } from "react";
+import MoodIcon from "./MoodIcon";
 
 const MOODS = [
-  { key: "bien", emoji: "🙂", bg: "bg-green-100", text: "text-green-800" },
-  { key: "ok", emoji: "😐", bg: "bg-amber-100", text: "text-amber-800" },
-  { key: "cansada", emoji: "😔", bg: "bg-orange-100", text: "text-orange-800" },
+  { key: "bien", bg: "bg-green-100", text: "text-green-800" },
+  { key: "ok", bg: "bg-amber-100", text: "text-amber-800" },
+  { key: "cansada", bg: "bg-orange-100", text: "text-orange-800" },
 ];
 
 export default function CheckIn({ onSubmit }) {
@@ -30,11 +31,11 @@ export default function CheckIn({ onSubmit }) {
           <button
             key={m.key}
             onClick={() => setMood(m.key)}
-            className={`flex-1 rounded-2xl py-4 text-2xl transition-all duration-200 hover:scale-105 active:scale-95 ${m.bg} ${
+            className={`flex-1 rounded-2xl py-4 transition-all duration-200 hover:scale-105 active:scale-95 ${m.bg} ${
               mood === m.key ? "ring-2 ring-kallpa-coral scale-110" : ""
             }`}
           >
-            {m.emoji}
+            <MoodIcon type={m.key} className="w-9 h-9 mx-auto" />
           </button>
         ))}
       </div>

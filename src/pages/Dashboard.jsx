@@ -5,6 +5,7 @@ import CheckIn from "../components/CheckIn";
 import GroupFeed from "../components/GroupFeed";
 import MicroChallenge from "../components/MicroChallenge";
 import AIMessage from "../components/AIMessage";
+import Meditar from "../components/Meditar";
 import Mascota from "../components/Mascota";
 import { getSession, logout } from "../lib/auth";
 import { supabase, supabaseConfigured } from "../lib/supabaseClient";
@@ -172,6 +173,7 @@ export default function Dashboard() {
         <motion.div initial="hidden" animate="show" variants={stagger} className="grid md:grid-cols-[1fr_1.1fr] gap-6">
           <div className="space-y-6">
             <motion.div variants={fadeUp}><CheckIn onSubmit={handleCheckIn} /></motion.div>
+            <motion.div variants={fadeUp}><Meditar /></motion.div>
             {reto && (
               <motion.div variants={fadeUp}>
                 <MicroChallenge reto={reto} totalIntegrantes={integrantes.length} userId={user.id} />

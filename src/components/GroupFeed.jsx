@@ -1,4 +1,4 @@
-const MOOD_EMOJI = { bien: "🙂", ok: "😐", cansada: "😔" };
+import MoodIcon from "./MoodIcon";
 
 export default function GroupFeed({ checkins }) {
   return (
@@ -17,9 +17,10 @@ export default function GroupFeed({ checkins }) {
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium bg-kallpa-teal/30">
                 {c.profiles?.initials || "?"}
               </div>
-              <p className="text-sm text-kallpa-text/80">
-                <span className="font-medium">{c.profiles?.name || "Alguien"}</span>{" "}
-                {MOOD_EMOJI[c.mood]} {c.nota && `— ${c.nota}`}
+              <p className="text-sm text-kallpa-text/80 flex items-center gap-1.5">
+                <span className="font-medium">{c.profiles?.name || "Alguien"}</span>
+                <MoodIcon type={c.mood} className="w-5 h-5" />
+                {c.nota && `— ${c.nota}`}
               </p>
             </div>
           ))}
