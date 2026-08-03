@@ -103,7 +103,8 @@ export default function Landing() {
             Kallpa
           </span>
         </div>
-        
+
+        <a
           href="#login"
           className="text-sm text-kallpa-coral-dark/70 hover:text-kallpa-coral-dark transition"
         >
