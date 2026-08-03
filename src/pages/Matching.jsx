@@ -38,6 +38,7 @@ export default function Matching() {
           userId: profile.id,
           carrera: datos.carrera,
           ciclo: datos.ciclo,
+          tipo_apoyo: datos.tipo_apoyo,
         });
         // Deja ver el último paso un momento antes de navegar
         setTimeout(() => {
