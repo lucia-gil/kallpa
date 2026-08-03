@@ -22,6 +22,55 @@ estudiantes accede a servicios de bienestar universitario.
 Kallpa no reemplaza la atención clínica: propone un modelo complementario,
 horizontal, que reduce el aislamiento como primera línea de apoyo.
 
+## Estructura de la web
+
+- `/` — landing pública con login demo (sin contraseña, solo nombre/carrera/ciclo)
+- `/app` — dashboard, layout de dos columnas para escritorio, requiere sesión
+
+La sesión demo se guarda en `localStorage` del navegador — no hay backend
+de autenticación real todavía (ver roadmap).
+
+## Conectar Supabase (base de datos real)
+
+1. Crea un proyecto en [supabase.com](https://supabase.com) (gratis)
+2. Ve a **SQL Editor** → **New query**, pega el contenido completo de
+   `supabase/schema.sql` y ejecútalo
+3. Ve a **Authentication → Providers** y activa **Anonymous Sign-Ins**
+   (así el login demo no pide contraseña, pero crea sesiones reales)
+4. Ve a **Settings → API**, copia la `Project URL` y la `anon public key`
+5. Pégalas en tu `.env`:
+   ```
+   VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+   VITE_SUPABASE_ANON_KEY=tu_anon_key
+   ```
+
+**Si no configuras Supabase**, la app sigue funcionando en modo demo con
+`localStorage` y datos de prueba — no es obligatorio para correr el proyecto.
+
+### Qué se sincroniza en tiempo real
+Los check-ins usan Supabase Realtime: si dos personas entran a la misma
+mancha (misma carrera/ciclo) desde dispositivos distintos, cada una ve el
+check-in de la otra aparecer al instante, sin recargar la página.
+
+### Matching por afinidad, no solo carrera/ciclo
+Después de los datos básicos, el registro incluye 3 preguntas cortas
+(estado de ánimo actual, tipo de apoyo que busca, mayor reto de equilibrio)
+diseñadas para que el matching agrupe personas realmente compatibles, no
+solo con la misma carrera. El criterio principal de agrupación es el
+**tipo de apoyo buscado** (catarsis, consejos prácticos, pertenencia, o
+desconexión) — si dos personas buscan cosas incompatibles dentro del
+mismo grupo, el soporte entre pares tiende a generar más frustración que
+alivio. Si no hay un grupo con ese match ideal, se hace fallback a
+agrupar solo por carrera/ciclo.
+
+### Sesión persistente
+Si ya iniciaste sesión antes en el mismo navegador, la Landing te redirige
+directo al dashboard en vez de pedirte el formulario de nuevo. Si cierras
+sesión, entras desde otro dispositivo, o borras el navegador, se crea una
+identidad anónima nueva (limitación conocida — el roadmap incluye
+autenticación real con correo institucional para persistencia real entre
+dispositivos).
+
 ## Cómo funciona
 
 1. **Matching por carga académica** — te agrupamos con estudiantes en tu
