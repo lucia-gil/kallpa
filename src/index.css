@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500&display=swap');
 
 @theme {
   --color-kallpa-coral: #F0997B;
@@ -7,19 +8,22 @@
   --color-kallpa-teal-dark: #04342C;
   --color-kallpa-cream: #FAEEDA;
   --color-kallpa-text: #712B13;
-
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-
-  --shadow-card: 0 1px 2px rgba(74, 27, 12, 0.04), 0 8px 24px -12px rgba(74, 27, 12, 0.18);
-  --shadow-card-hover: 0 2px 4px rgba(74, 27, 12, 0.06), 0 16px 32px -14px rgba(74, 27, 12, 0.24);
+  --font-title: "Fraunces", serif;
 }
 
 body {
-  background: radial-gradient(circle at 15% 0%, #fff6e9 0%, var(--color-kallpa-cream) 45%);
-  background-attachment: fixed;
+  background-color: var(--color-kallpa-cream);
+  background-image: radial-gradient(circle at 1px 1px, rgba(74, 27, 12, 0.06) 1px, transparent 0);
+  background-size: 24px 24px;
   color: var(--color-kallpa-coral-dark);
-  font-family: var(--font-sans);
   margin: 0;
-  -webkit-font-smoothing: antialiased;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.font-title {
+  font-family: var(--font-title);
+}
+
+* {
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }

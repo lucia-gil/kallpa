@@ -1,9 +1,3 @@
-// NOTA IMPORTANTE PARA EL HACKATHON:
-// Esta llamada se hace directo desde el frontend por simplicidad de demo.
-// Esto expone la API key en el navegador — está bien para una demo local/
-// hackathon, pero para producción real se debe mover esta llamada a un
-// backend (ej. una función serverless de Supabase o Vercel) que guarde
-// la key como variable de entorno del servidor, nunca del cliente.
 
 const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 

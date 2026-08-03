@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kallpa-coral: #F0997B;
+  --color-kallpa-coral-dark: #4A1B0C;
+  --color-kallpa-teal: #5DCAA5;
+  --color-kallpa-teal-dark: #04342C;
+  --color-kallpa-cream: #FAEEDA;
+  --color-kallpa-text: #712B13;
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(74, 27, 12, 0.04), 0 8px 24px -12px rgba(74, 27, 12, 0.18);
+  --shadow-card-hover: 0 2px 4px rgba(74, 27, 12, 0.06), 0 16px 32px -14px rgba(74, 27, 12, 0.24);
+}
+
+body {
+  background: radial-gradient(circle at 15% 0%, #fff6e9 0%, var(--color-kallpa-cream) 45%);
+  background-attachment: fixed;
+  color: var(--color-kallpa-coral-dark);
+  font-family: var(--font-sans);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}

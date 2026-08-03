@@ -1,0 +1,251 @@
+diff --git a/index.html b/index.html
+index 610a9d4..a552961 100644
+--- a/index.html
++++ b/index.html
+@@ -1,10 +1,17 @@
+ <!doctype html>
+-<html lang="en">
++<html lang="es">
+   <head>
+     <meta charset="UTF-8" />
+     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>kallpa</title>
++    <meta name="description" content="Kallpa — pequeños grupos de apoyo entre pares para combatir el burnout académico." />
++    <link rel="preconnect" href="https://fonts.googleapis.com" />
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
++    <link
++      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
++      rel="stylesheet"
++    />
++    <title>Kallpa — tu pausa entre ciclos</title>
+   </head>
+   <body>
+     <div id="root"></div>
+diff --git a/src/components/AIMessage.jsx b/src/components/AIMessage.jsx
+index 97b77cc..8572eb3 100644
+--- a/src/components/AIMessage.jsx
++++ b/src/components/AIMessage.jsx
+@@ -10,7 +10,7 @@ export default function AIMessage({ checkins, grupoNombre }) {
+     try {
+       const texto = await generateWeeklyMessage(checkins, grupoNombre);
+       setMensaje(texto);
+-    } catch (e) {
++    } catch {
+       setMensaje("Hubo un problema generando el mensaje. Intenta de nuevo.");
+     } finally {
+       setLoading(false);
+@@ -18,25 +18,25 @@ export default function AIMessage({ checkins, grupoNombre }) {
+   };
+ 
+   return (
+-    <div className="bg-kallpa-coral/15 rounded-3xl p-5">
+-      <div className="flex items-center justify-between mb-2">
+-        <p className="text-xs uppercase tracking-wide text-kallpa-coral-dark/60">
++    <div className="bg-kallpa-coral/15 rounded-3xl shadow-card p-6">
++      <div className="flex items-center justify-between mb-3">
++        <p className="text-xs uppercase tracking-widest text-kallpa-coral-dark/60 font-semibold">
+           Mensaje de la semana
+         </p>
+         {modoDemo && (
+-          <span className="text-[10px] bg-white/60 text-kallpa-coral-dark/60 px-2 py-0.5 rounded-full">
++          <span className="text-[10px] font-semibold bg-white/70 text-kallpa-coral-dark/60 px-2 py-0.5 rounded-full">
+             modo demo
+           </span>
+         )}
+       </div>
+-      
++
+       {mensaje ? (
+-        <p className="text-sm text-kallpa-coral-dark leading-relaxed">{mensaje}</p>
++        <p className="font-display text-base text-kallpa-coral-dark leading-relaxed">{mensaje}</p>
+       ) : (
+         <button
+           onClick={generar}
+           disabled={loading}
+-          className="text-sm font-medium text-kallpa-coral-dark underline disabled:opacity-50"
++          className="text-sm font-semibold text-kallpa-coral-dark underline decoration-kallpa-coral/50 underline-offset-4 disabled:opacity-50"
+         >
+           {loading ? "Generando..." : "Ver mensaje del grupo"}
+         </button>
+diff --git a/src/components/CheckIn.jsx b/src/components/CheckIn.jsx
+index 127b15e..ac421e8 100644
+--- a/src/components/CheckIn.jsx
++++ b/src/components/CheckIn.jsx
+@@ -18,8 +18,8 @@ export default function CheckIn({ onSubmit }) {
+   };
+ 
+   return (
+-    <div className="bg-white rounded-3xl border border-kallpa-coral/20 p-5">
+-      <p className="text-sm text-kallpa-text/70 mb-4">
++    <div className="bg-white rounded-3xl shadow-card p-6">
++      <p className="font-display text-lg text-kallpa-coral-dark mb-5">
+         Antes de seguir con todo, respira un momento.
+       </p>
+       <div className="flex gap-3 mb-4">
+@@ -27,8 +27,10 @@ export default function CheckIn({ onSubmit }) {
+           <button
+             key={m.key}
+             onClick={() => setMood(m.key)}
+-            className={`flex-1 rounded-2xl py-4 text-2xl transition ${m.bg} ${
+-              mood === m.key ? "ring-2 ring-kallpa-coral" : ""
++            className={`flex-1 rounded-2xl py-4 text-2xl transition-all duration-150 ${m.bg} ${
++              mood === m.key
++                ? "ring-2 ring-kallpa-coral ring-offset-2 ring-offset-white scale-105"
++                : "hover:scale-[1.03]"
+             }`}
+           >
+             {m.emoji}
+@@ -40,12 +42,16 @@ export default function CheckIn({ onSubmit }) {
+         value={nota}
+         onChange={(e) => setNota(e.target.value)}
+         placeholder="¿Algo que quieras contar? (opcional)"
+-        className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2 text-sm mb-4 outline-none focus:ring-2 focus:ring-kallpa-teal"
++        className="w-full rounded-xl border border-kallpa-coral/20 bg-kallpa-cream/40 px-3.5 py-2.5 text-sm mb-4 outline-none transition focus:border-kallpa-teal focus:ring-2 focus:ring-kallpa-teal/40"
+       />
+       <button
+         onClick={handleSubmit}
+         disabled={!mood}
+-        className="w-full rounded-xl bg-kallpa-coral text-white py-2.5 font-medium disabled:opacity-40"
++        className={`w-full rounded-xl py-3 font-semibold transition-all ${
++          mood
++            ? "bg-kallpa-coral text-white shadow-card hover:brightness-105 active:scale-[0.98]"
++            : "bg-kallpa-coral/10 text-kallpa-coral-dark/35 cursor-not-allowed"
++        }`}
+       >
+         Compartir con tu mancha
+       </button>
+diff --git a/src/components/GroupFeed.jsx b/src/components/GroupFeed.jsx
+index 52ee3de..1ec2761 100644
+--- a/src/components/GroupFeed.jsx
++++ b/src/components/GroupFeed.jsx
+@@ -4,23 +4,24 @@ export default function GroupFeed({ grupo, checkins }) {
+   const byUser = (id) => grupo.integrantes.find((m) => m.id === id);
+ 
+   return (
+-    <div className="bg-white rounded-3xl border border-kallpa-coral/20 p-5">
+-      <p className="text-xs uppercase tracking-wide text-kallpa-text/50 mb-3">
++    <div className="bg-white rounded-3xl shadow-card p-6">
++      <p className="text-xs uppercase tracking-widest text-kallpa-text/45 font-semibold mb-4">
+         Cómo está tu mancha
+       </p>
+-      <div className="space-y-3">
++      <div className="space-y-4">
+         {checkins.map((c) => {
+           const user = byUser(c.userId);
++          if (!user) return null;
+           const colorBg = user.color === "teal" ? "bg-kallpa-teal/30" : "bg-kallpa-coral/30";
+           return (
+             <div key={c.id} className="flex items-center gap-3">
+               <div
+-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${colorBg}`}
++                className={`w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold ${colorBg}`}
+               >
+                 {user.initials}
+               </div>
+-              <p className="text-sm text-kallpa-text/80">
+-                <span className="font-medium">{user.name}</span>{" "}
++              <p className="text-sm text-kallpa-text/80 leading-snug">
++                <span className="font-semibold text-kallpa-coral-dark">{user.name}</span>{" "}
+                 {MOOD_EMOJI[c.mood]} — {c.nota}
+               </p>
+             </div>
+diff --git a/src/components/MicroChallenge.jsx b/src/components/MicroChallenge.jsx
+index 5e7ee7a..2260478 100644
+--- a/src/components/MicroChallenge.jsx
++++ b/src/components/MicroChallenge.jsx
+@@ -3,19 +3,19 @@ export default function MicroChallenge({ reto, grupo }) {
+   const total = grupo.integrantes.length;
+ 
+   return (
+-    <div className="bg-kallpa-teal/20 rounded-3xl p-5">
+-      <p className="text-xs uppercase tracking-wide text-kallpa-teal-dark/60 mb-2">
++    <div className="bg-kallpa-teal/15 rounded-3xl shadow-card p-6">
++      <p className="text-xs uppercase tracking-widest text-kallpa-teal-dark/60 font-semibold mb-2">
+         Reto de la semana
+       </p>
+-      <p className="text-sm font-medium text-kallpa-teal-dark mb-3">{reto.titulo}</p>
+-      <div className="flex items-center gap-2">
+-        <div className="flex-1 h-2 rounded-full bg-white/60 overflow-hidden">
++      <p className="font-display text-lg text-kallpa-teal-dark mb-4">{reto.titulo}</p>
++      <div className="flex items-center gap-3">
++        <div className="flex-1 h-2.5 rounded-full bg-white/70 overflow-hidden">
+           <div
+-            className="h-full bg-kallpa-teal"
++            className="h-full rounded-full bg-kallpa-teal transition-all duration-500"
+             style={{ width: `${(progreso / total) * 100}%` }}
+           />
+         </div>
+-        <span className="text-xs text-kallpa-teal-dark/70">
++        <span className="text-xs font-semibold text-kallpa-teal-dark/70 tabular-nums">
+           {progreso}/{total}
+         </span>
+       </div>
+diff --git a/src/index.css b/src/index.css
+index 772bb0f..7f9d82e 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -7,10 +7,19 @@
+   --color-kallpa-teal-dark: #04342C;
+   --color-kallpa-cream: #FAEEDA;
+   --color-kallpa-text: #712B13;
++
++  --font-display: "Fraunces", ui-serif, Georgia, serif;
++  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
++
++  --shadow-card: 0 1px 2px rgba(74, 27, 12, 0.04), 0 8px 24px -12px rgba(74, 27, 12, 0.18);
++  --shadow-card-hover: 0 2px 4px rgba(74, 27, 12, 0.06), 0 16px 32px -14px rgba(74, 27, 12, 0.24);
+ }
+ 
+ body {
+-  background-color: var(--color-kallpa-cream);
++  background: radial-gradient(circle at 15% 0%, #fff6e9 0%, var(--color-kallpa-cream) 45%);
++  background-attachment: fixed;
+   color: var(--color-kallpa-coral-dark);
++  font-family: var(--font-sans);
+   margin: 0;
++  -webkit-font-smoothing: antialiased;
+ }
+diff --git a/src/pages/Home.jsx b/src/pages/Home.jsx
+index 6d3e7ca..93ea438 100644
+--- a/src/pages/Home.jsx
++++ b/src/pages/Home.jsx
+@@ -16,17 +16,28 @@ export default function Home() {
+   };
+ 
+   return (
+-    <div className="max-w-md mx-auto px-4 py-8">
+-      <div className="flex items-center gap-2 mb-6">
+-        <div className="w-8 h-8 rounded-full bg-kallpa-coral" />
+-        <h1 className="text-xl font-medium text-kallpa-coral-dark">{grupo.nombre}</h1>
+-      </div>
++    <div className="min-h-screen">
++      <div className="max-w-md mx-auto px-5 py-10">
++        <header className="flex items-center gap-3 mb-8">
++          <div className="w-10 h-10 rounded-full bg-kallpa-coral shadow-card flex items-center justify-center text-white text-sm font-semibold font-display">
++            {grupo.nombre.charAt(0)}
++          </div>
++          <div>
++            <p className="text-[11px] uppercase tracking-widest text-kallpa-coral-dark/50 font-medium">
++              Kallpa
++            </p>
++            <h1 className="text-2xl font-display font-medium text-kallpa-coral-dark leading-tight">
++              {grupo.nombre}
++            </h1>
++          </div>
++        </header>
+ 
+-      <div className="space-y-4">
+-        <CheckIn onSubmit={handleCheckIn} />
+-        <GroupFeed grupo={grupo} checkins={checkins} />
+-        <MicroChallenge reto={microReto} grupo={grupo} />
+-        <AIMessage checkins={checkins} grupoNombre={grupo.nombre} />
++        <div className="space-y-5">
++          <CheckIn onSubmit={handleCheckIn} />
++          <GroupFeed grupo={grupo} checkins={checkins} />
++          <MicroChallenge reto={microReto} grupo={grupo} />
++          <AIMessage checkins={checkins} grupoNombre={grupo.nombre} />
++        </div>
+       </div>
+     </div>
+   );
