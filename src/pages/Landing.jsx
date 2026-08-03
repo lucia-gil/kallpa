@@ -1,29 +1,93 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Mascota from "../components/Mascota";
+import { getSession } from "../lib/auth";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
-
 const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.12 } },
 };
 
+const PREGUNTA_ANIMO = {
+  key: "estado_animo",
+  texto: '¿Cómo te sientes con la "U" ahora mismo?',
+  opciones: [
+    { valor: "agotamiento", label: "Agotadaza, siento que mi batería está en 0%" },
+    { valor: "cinismo", label: "Un poco desmotivada, como que ya me da igual todo" },
+    { valor: "ineficacia", label: "Siento que no avanzo o que no doy la talla" },
+    { valor: "leve", label: "Ahí vamos, solo necesito un respiro para no explotar" },
+  ],
+};
+
+const PREGUNTA_APOYO = {
+  key: "tipo_apoyo",
+  texto: "Si la cosa se pone pesada, ¿qué es lo que más te ayuda de un grupo?",
+  opciones: [
+    { valor: "catarsis", label: "Que me escuchen y poder soltar todo" },
+    { valor: "practico", label: "Tips o consejos prácticos para organizarme mejor" },
+    { valor: "pertenencia", label: "Saber que otros están en las mismas que yo" },
+    { valor: "desconexion", label: "Desconectar un rato y hablar de otra cosa" },
+  ],
+};
+
+const PREGUNTA_RETO = {
+  key: "reto_principal",
+  texto: "¿Cuál es tu mayor reto para equilibrar tu vida hoy?",
+  opciones: [
+    { valor: "cursos", label: "Tengo demasiados cursos y tareas pendientes" },
+    { valor: "trabajo", label: "Tengo que trabajar y estudiar al mismo tiempo" },
+    { valor: "vinculos", label: "No tengo tiempo para mi familia o amigos" },
+    { valor: "pantallas", label: "Me cuesta mucho desconectarme de las pantallas" },
+  ],
+};
+
+const PREGUNTAS = [PREGUNTA_ANIMO, PREGUNTA_APOYO, PREGUNTA_RETO];
+
 export default function Landing() {
+  const [paso, setPaso] = useState(0); // 0 = datos básicos, 1..3 = preguntas
   const [name, setName] = useState("");
   const [carrera, setCarrera] = useState("");
   const [ciclo, setCiclo] = useState("");
+  const [respuestas, setRespuestas] = useState({});
+  const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  // Si ya hay sesión activa (mismo navegador), no pedimos el formulario de nuevo
+  useEffect(() => {
+    (async () => {
+      const session = await getSession();
+      if (session?.group_id) {
+        navigate("/app");
+        return;
+      }
+      setCheckingSession(false);
+    })();
+  }, [navigate]);
+
+  const handleDatosBasicos = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    navigate("/matching", { state: { name, carrera, ciclo } });
+    setPaso(1);
   };
+
+  const handleRespuesta = (key, valor) => {
+    const nuevas = { ...respuestas, [key]: valor };
+    setRespuestas(nuevas);
+    if (paso < PREGUNTAS.length) {
+      setPaso(paso + 1);
+    } else {
+      navigate("/matching", { state: { name, carrera, ciclo, ...nuevas } });
+    }
+  };
+
+  if (checkingSession) return null;
+
+  const preguntaActual = paso >= 1 && paso <= PREGUNTAS.length ? PREGUNTAS[paso - 1] : null;
 
   return (
     <div className="min-h-screen overflow-x-hidden">
@@ -39,7 +103,7 @@ export default function Landing() {
             Kallpa
           </span>
         </div>
-        <a
+        
           href="#login"
           className="text-sm text-kallpa-coral-dark/70 hover:text-kallpa-coral-dark transition"
         >
@@ -75,59 +139,100 @@ export default function Landing() {
           </motion.div>
         </motion.div>
 
-        <motion.form
+        <motion.div
           id="login"
-          onSubmit={handleLogin}
           initial={{ opacity: 0, scale: 0.94, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           whileHover={{ y: -4 }}
-          className="bg-white rounded-3xl border border-kallpa-coral/15 p-8 shadow-lg shadow-kallpa-coral/10"
+          className="bg-white rounded-3xl border border-kallpa-coral/15 p-8 shadow-lg shadow-kallpa-coral/10 min-h-[420px] flex flex-col"
         >
-          <h2 className="font-title text-xl font-semibold text-kallpa-coral-dark mb-1">
-            Entra a tu mancha
-          </h2>
-          <p className="text-sm text-kallpa-text/60 mb-6">
-            Demo — no necesitas contraseña, solo cuéntanos quién eres.
-          </p>
+          <AnimatePresence mode="wait">
+            {paso === 0 && (
+              <motion.form
+                key="datos"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                onSubmit={handleDatosBasicos}
+              >
+                <h2 className="font-title text-xl font-semibold text-kallpa-coral-dark mb-1">
+                  Entra a tu mancha
+                </h2>
+                <p className="text-sm text-kallpa-text/60 mb-6">
+                  Demo — no necesitas contraseña, solo cuéntanos quién eres.
+                </p>
 
-          <label className="block text-sm text-kallpa-coral-dark/70 mb-1">Nombre</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Tu nombre"
-            className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2.5 text-sm mb-4 outline-none focus:ring-2 focus:ring-kallpa-teal"
-            required
-          />
+                <label className="block text-sm text-kallpa-coral-dark/70 mb-1">Nombre</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Tu nombre"
+                  className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2.5 text-sm mb-4 outline-none focus:ring-2 focus:ring-kallpa-teal"
+                  required
+                />
 
-          <label className="block text-sm text-kallpa-coral-dark/70 mb-1">Carrera</label>
-          <input
-            type="text"
-            value={carrera}
-            onChange={(e) => setCarrera(e.target.value)}
-            placeholder="Ej: Ingeniería, Medicina..."
-            className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2.5 text-sm mb-4 outline-none focus:ring-2 focus:ring-kallpa-teal"
-          />
+                <label className="block text-sm text-kallpa-coral-dark/70 mb-1">Carrera</label>
+                <input
+                  type="text"
+                  value={carrera}
+                  onChange={(e) => setCarrera(e.target.value)}
+                  placeholder="Ej: Ingeniería, Medicina..."
+                  className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2.5 text-sm mb-4 outline-none focus:ring-2 focus:ring-kallpa-teal"
+                />
 
-          <label className="block text-sm text-kallpa-coral-dark/70 mb-1">Ciclo actual</label>
-          <input
-            type="text"
-            value={ciclo}
-            onChange={(e) => setCiclo(e.target.value)}
-            placeholder="Ej: 6"
-            className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2.5 text-sm mb-6 outline-none focus:ring-2 focus:ring-kallpa-teal"
-          />
+                <label className="block text-sm text-kallpa-coral-dark/70 mb-1">Ciclo actual</label>
+                <input
+                  type="text"
+                  value={ciclo}
+                  onChange={(e) => setCiclo(e.target.value)}
+                  placeholder="Ej: 6"
+                  className="w-full rounded-xl border border-kallpa-coral/20 px-3 py-2.5 text-sm mb-6 outline-none focus:ring-2 focus:ring-kallpa-teal"
+                />
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            className="w-full rounded-xl bg-kallpa-coral text-white py-3 font-medium hover:opacity-90 transition"
-          >
-            Entrar a Kallpa
-          </motion.button>
-        </motion.form>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  className="w-full rounded-xl bg-kallpa-coral text-white py-3 font-medium hover:opacity-90 transition"
+                >
+                  Continuar
+                </motion.button>
+              </motion.form>
+            )}
+
+            {preguntaActual && (
+              <motion.div
+                key={preguntaActual.key}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex flex-col flex-1"
+              >
+                <p className="text-xs text-kallpa-coral-dark/50 mb-2">
+                  Pregunta {paso} de {PREGUNTAS.length}
+                </p>
+                <h2 className="font-title text-xl font-semibold text-kallpa-coral-dark mb-6">
+                  {preguntaActual.texto}
+                </h2>
+                <div className="space-y-3 flex-1">
+                  {preguntaActual.opciones.map((op) => (
+                    <motion.button
+                      key={op.valor}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleRespuesta(preguntaActual.key, op.valor)}
+                      className="w-full text-left rounded-xl border border-kallpa-coral/20 px-4 py-3 text-sm text-kallpa-coral-dark hover:bg-kallpa-coral/10 transition"
+                    >
+                      {op.label}
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </main>
 
       {/* Cómo funciona */}
@@ -147,7 +252,7 @@ export default function Landing() {
 
         <div className="grid md:grid-cols-4 gap-6">
           {[
-            { n: "01", t: "Matching por carga", d: "Te agrupamos con estudiantes en tu misma situación académica." },
+            { n: "01", t: "Matching por afinidad", d: "Te agrupamos con estudiantes en tu misma situación y forma de buscar apoyo." },
             { n: "02", t: "Check-in rápido", d: "Comparte cómo va tu semana con un emoji y una nota corta." },
             { n: "03", t: "Mensaje del grupo", d: "Recibe un mensaje empático generado con IA según el ánimo del grupo." },
             { n: "04", t: "Micro-reto colectivo", d: "Cumplan juntos una meta simple de descanso, no de productividad." },

@@ -7,34 +7,48 @@ function nombreAleatorio() {
   return NOMBRES_MANCHA[Math.floor(Math.random() * NOMBRES_MANCHA.length)];
 }
 
-// Busca un grupo con la misma carrera y ciclo que tenga espacio.
-// Si no encuentra ninguno, crea uno nuevo. Devuelve el group_id.
-export async function encontrarOCrearGrupo({ userId, carrera, ciclo }) {
-  if (!supabaseConfigured) return "demo-group";
-
-  // 1. Busca grupos existentes de la misma carrera/ciclo
-  const { data: gruposCandidatos } = await supabase
-    .from("groups")
-    .select("id, carrera, ciclo")
-    .eq("carrera", carrera || null)
-    .eq("ciclo", ciclo || null);
-
-  for (const g of gruposCandidatos || []) {
+async function grupoConEspacio(query) {
+  const { data: candidatos } = await query;
+  for (const g of candidatos || []) {
     const { count } = await supabase
       .from("profiles")
       .select("id", { count: "exact", head: true })
       .eq("group_id", g.id);
+    if ((count || 0) < MAX_INTEGRANTES) return g;
+  }
+  return null;
+}
 
-    if ((count || 0) < MAX_INTEGRANTES) {
-      await supabase.from("profiles").update({ group_id: g.id }).eq("id", userId);
-      return g.id;
-    }
+export async function encontrarOCrearGrupo({ userId, carrera, ciclo, tipo_apoyo }) {
+  if (!supabaseConfigured) return "demo-group";
+
+  let grupo = await grupoConEspacio(
+    supabase
+      .from("groups")
+      .select("id, carrera, ciclo, tipo_apoyo")
+      .eq("carrera", carrera || null)
+      .eq("ciclo", ciclo || null)
+      .eq("tipo_apoyo", tipo_apoyo || null)
+  );
+
+  if (!grupo) {
+    grupo = await grupoConEspacio(
+      supabase
+        .from("groups")
+        .select("id, carrera, ciclo, tipo_apoyo")
+        .eq("carrera", carrera || null)
+        .eq("ciclo", ciclo || null)
+    );
   }
 
-  // 2. No hay grupo con espacio: crea uno nuevo
+  if (grupo) {
+    await supabase.from("profiles").update({ group_id: grupo.id }).eq("id", userId);
+    return grupo.id;
+  }
+
   const { data: nuevoGrupo, error } = await supabase
     .from("groups")
-    .insert({ name: nombreAleatorio(), carrera, ciclo })
+    .insert({ name: nombreAleatorio(), carrera, ciclo, tipo_apoyo })
     .select()
     .single();
 
@@ -42,7 +56,6 @@ export async function encontrarOCrearGrupo({ userId, carrera, ciclo }) {
 
   await supabase.from("profiles").update({ group_id: nuevoGrupo.id }).eq("id", userId);
 
-  // Crea un micro-reto inicial para el grupo nuevo
   await supabase.from("challenges").insert({
     group_id: nuevoGrupo.id,
     titulo: "Esta semana el grupo intenta dormir 7 horas",

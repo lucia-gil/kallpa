@@ -31,20 +31,18 @@ export async function getSession() {
   return profile;
 }
 
-export async function login({ name, carrera, ciclo }) {
+export async function login({ name, carrera, ciclo, estado_animo, tipo_apoyo, reto_principal }) {
   if (!supabaseConfigured) {
-    const user = { id: "demo-" + Date.now(), name, initials: initials(name), carrera, ciclo };
+    const user = { id: "demo-" + Date.now(), name, initials: initials(name), carrera, ciclo, estado_animo, tipo_apoyo, reto_principal };
     localStorage.setItem(KEY, JSON.stringify(user));
     return user;
   }
 
-  // 1. Sesión anónima real de Supabase (no requiere contraseña)
   const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
   if (authError) throw authError;
 
   const userId = authData.user.id;
 
-  // 2. Crea el perfil vinculado a esa sesión
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .upsert({
@@ -53,6 +51,9 @@ export async function login({ name, carrera, ciclo }) {
       initials: initials(name),
       carrera: carrera || null,
       ciclo: ciclo || null,
+      estado_animo: estado_animo || null,
+      tipo_apoyo: tipo_apoyo || null,
+      reto_principal: reto_principal || null,
     })
     .select()
     .single();
