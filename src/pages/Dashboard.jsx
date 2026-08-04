@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import CheckIn from "../components/CheckIn";
+import MoodHistory from "../components/MoodHistory";
 import GroupFeed from "../components/GroupFeed";
 import MicroChallenge from "../components/MicroChallenge";
 import AIMessage from "../components/AIMessage";
@@ -99,7 +100,14 @@ export default function Dashboard() {
   const handleCheckIn = async ({ mood, nota }) => {
     if (!supabaseConfigured) {
       setCheckins([
-        { id: `c${Date.now()}`, user_id: user.id, mood, nota, profiles: { name: user.name, initials: user.initials } },
+        {
+          id: `c${Date.now()}`,
+          user_id: user.id,
+          mood,
+          nota,
+          created_at: new Date().toISOString(),
+          profiles: { name: user.name, initials: user.initials },
+        },
         ...checkins,
       ]);
       return;
@@ -171,9 +179,10 @@ export default function Dashboard() {
           </h1>
         </motion.div>
 
-        <motion.div initial="hidden" animate="show" variants={stagger} className="grid md:grid-cols-[1fr_1.1fr] gap-6">
+        <motion.div initial="hidden" animate="show" variants={stagger} className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-6">
           <div className="space-y-6">
             <motion.div variants={fadeUp}><CheckIn onSubmit={handleCheckIn} /></motion.div>
+            <motion.div variants={fadeUp}><MoodHistory checkins={checkins} userId={user.id} /></motion.div>
             <motion.div variants={fadeUp}><Meditar /></motion.div>
             {reto && (
               <motion.div variants={fadeUp}>
