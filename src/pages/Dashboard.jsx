@@ -6,6 +6,7 @@ import GroupFeed from "../components/GroupFeed";
 import MicroChallenge from "../components/MicroChallenge";
 import AIMessage from "../components/AIMessage";
 import Meditar from "../components/Meditar";
+import SupportChat from "../components/SupportChat";
 import Mascota from "../components/Mascota";
 import { getSession, logout } from "../lib/auth";
 import { supabase, supabaseConfigured } from "../lib/supabaseClient";
@@ -186,6 +187,7 @@ export default function Dashboard() {
           </div>
         </motion.div>
       </main>
+      <SupportChat />
     </div>
   );
 }
