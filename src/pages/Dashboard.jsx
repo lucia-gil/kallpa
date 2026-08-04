@@ -187,7 +187,7 @@ export default function Dashboard() {
           </div>
         </motion.div>
       </main>
-      <SupportChat />
+      <SupportChat userId={user.id} />
     </div>
   );
 }
