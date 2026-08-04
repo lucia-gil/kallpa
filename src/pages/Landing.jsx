@@ -95,7 +95,7 @@ export default function Landing() {
 
   const STEPS = [
     { key: "name", type: "text", placeholder: "Tu nombre" },
-    { key: "carrera", type: "carrera", prompt: () => `Un gusto, ${respuestas.name}. ¿Qué carrera estudias?` },
+    { key: "carrera", type: "carrera", prompt: (r) => `Un gusto, ${r.name}. ¿Qué carrera estudias?` },
     { key: "ciclo", type: "text", numeric: true, prompt: () => "¿En qué ciclo vas?", placeholder: "Ej: 6" },
     { key: "genero", type: "choice", prompt: () => "¿Cómo te identificas? (para hablarte mejor)", opciones: OPCIONES_GENERO },
     { key: "estado_animo", type: "choice", prompt: () => '¿Cómo te sientes con la "U" ahora mismo?', opciones: textoAnimo(respuestas.genero) },
